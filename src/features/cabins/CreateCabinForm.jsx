@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import FormRow from "../../ui/FormRow";
 import { usePostEditCabin } from "./usePostEditCabin";
 
-function CreateCabinForm({ cabinToEdit = {} }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { id: editID, ...editValues } = cabinToEdit;
   const isEdit = Boolean(editID);
 
@@ -17,7 +17,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   });
 
   const { mutate, isEditing } = usePostEditCabin({
-    onSuccess: () => reset(),
+    onSuccess: () => {
+      reset();
+      onCloseModal();
+    },
   });
   const { errors } = formState;
 
@@ -39,7 +42,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     console.log("validation stuff", err);
   }
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={onCloseModal ? "modal" : "regular"}
+    >
       <FormRow label={"cabin name"} error={errors?.name?.message}>
         <Input
           type="text"
@@ -109,10 +115,12 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button variation="secondary" onClick={onCloseModal} type="reset">
           Cancel
         </Button>
-        <Button disabled={isEditing}>{isEdit ? "Edit Cabin" : "Create New Cabin"}</Button>
+        <Button disabled={isEditing}>
+          {isEdit ? "Edit Cabin" : "Create New Cabin"}
+        </Button>
       </FormRow>
     </Form>
   );

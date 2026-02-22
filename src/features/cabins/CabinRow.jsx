@@ -3,6 +3,11 @@ import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
+import { usePostEditCabin } from "./usePostEditCabin";
+import { AiFillDelete, AiFillEdit, AiTwotoneCopy } from "react-icons/ai";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "./../../ui/ConfirmDelete";
+import Button from "../../ui/Button";
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -43,35 +48,67 @@ const Discount = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const [showForm, setShowForm] = useState(false);
-  const { mutate, isDeleting } = useDeleteCabin();
-
+  const { mutate: deleteCabin, isDeleting } = useDeleteCabin();
+  const { mutate: dupeCabin } = usePostEditCabin();
   const {
     name,
     image,
     regularPrice,
     discount,
     maxCapacity,
+    description,
     id: cabinID,
   } = cabin;
 
+  function handleDupe() {
+    const { id, ...cabinData } = cabin;
+    dupeCabin({
+      newCabinData: {
+        ...cabinData,
+        name: `Copy of ${name}`,
+      },
+      id: undefined, // Pas d'id pour créer une nouvelle entrée
+    });
+  }
+
   return (
-    <>
-      <TableRow role="row">
-        <Img src={image} />
-        <Cabin>{name}</Cabin>
-        <div>Fits up tp {maxCapacity} guests</div>
-        <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
-        <div>
-          <button onClick={() => setShowForm(!showForm)}>Edit</button>
-          <button onClick={() => mutate(cabinID)} disabled={isDeleting}>
-            {isDeleting ? "Deleting…" : "Delete"}
-          </button>
-        </div>
-      </TableRow>
-      {showForm && <CreateCabinForm cabinToEdit={cabin} />}
-    </>
+    <TableRow role="row">
+      <Img src={image} />
+
+      <Cabin>{name}</Cabin>
+      <div>Fits up tp {maxCapacity} guests</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      <Discount>{formatCurrency(discount)}</Discount>
+      <div>
+        <Modal>
+          <Modal.Open opens={"edit-open"}>
+            <button>
+              {" "}
+              <AiFillEdit />
+            </button>
+          </Modal.Open>
+          <Modal.Window name={"edit-open"}>
+            <CreateCabinForm cabinToEdit={cabin} />
+          </Modal.Window>
+
+          <Modal.Open opens={"delete-open"}>
+            <button>
+              {" "}
+              <AiFillDelete />
+            </button>
+          </Modal.Open>
+          <Modal.Window name={"delete-open"}>
+            <ConfirmDelete
+              onConfirm={() => deleteCabin(cabinID)}
+              disabled={isDeleting}
+            />
+          </Modal.Window>
+        </Modal>
+        <button onClick={handleDupe}>
+          <AiTwotoneCopy />
+        </button>
+      </div>
+    </TableRow>
   );
 }
 

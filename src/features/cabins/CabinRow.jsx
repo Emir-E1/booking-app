@@ -3,7 +3,10 @@ import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
-const TableRow = styled.div`
+import Table from "./../../ui/Table";
+import { AiFillCopy, AiFillDelete, AiFillEdit } from "react-icons/ai";
+import { usePostEditCabin } from "./usePostEditCabin";
+/*const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
   column-gap: 2.4rem;
@@ -13,7 +16,7 @@ const TableRow = styled.div`
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
-`;
+`;*/
 
 const Img = styled.img`
   display: block;
@@ -44,7 +47,8 @@ const Discount = styled.div`
 
 function CabinRow({ cabin }) {
   const [showForm, setShowForm] = useState(false);
-  const { mutate, isDeleting } = useDeleteCabin();
+  const { mutate: deleteCabin, isDeleting } = useDeleteCabin();
+  const { mutate: createCabin, isCreating } = usePostEditCabin();
 
   const {
     name,
@@ -52,24 +56,41 @@ function CabinRow({ cabin }) {
     regularPrice,
     discount,
     maxCapacity,
+    description,
     id: cabinID,
   } = cabin;
 
+  function handleDuplicate() {
+    createCabin({
+      name: `Copy of ${name}`,
+      maxCapacity,
+      regularPrice,
+      discount,
+      image,
+      description,
+    });
+  }
+
   return (
     <>
-      <TableRow role="row">
+      <Table.Row role="row">
         <Img src={image} />
         <Cabin>{name}</Cabin>
         <div>Fits up tp {maxCapacity} guests</div>
         <Price>{formatCurrency(regularPrice)}</Price>
         <Discount>{formatCurrency(discount)}</Discount>
         <div>
-          <button onClick={() => setShowForm(!showForm)}>Edit</button>
-          <button onClick={() => mutate(cabinID)} disabled={isDeleting}>
-            {isDeleting ? "Deleting…" : "Delete"}
+          <button disabled={isCreating} onClick={handleDuplicate}>
+            <AiFillCopy />
+          </button>
+          <button onClick={() => setShowForm((show) => !show)}>
+            <AiFillEdit />
+          </button>
+          <button onClick={() => deleteCabin(cabinID)} disabled={isDeleting}>
+            <AiFillDelete />
           </button>
         </div>
-      </TableRow>
+      </Table.Row>
       {showForm && <CreateCabinForm cabinToEdit={cabin} />}
     </>
   );

@@ -11,7 +11,7 @@ import {
   AiTwotoneCopy,
 } from "react-icons/ai";
 import Modal from "../../ui/Modal";
-import ConfirmDelete from "./../../ui/ConfirmDelete";
+import ConfirmDelete from "../../ui/ConfirmDelete";
 import Button from "../../ui/Button";
 import Menus from "../../ui/Menus";
 const TableRow = styled.div`
@@ -87,28 +87,22 @@ function CabinRow({ cabin }) {
       <Discount>{formatCurrency(discount)}</Discount>
       <div>
         <Modal>
-          <Menus.Menu>
-            <Menus.Toggle id={cabinID} />
-
-            <Menus.List id={cabinID}>
-              <Menus.Button icone={<AiTwotoneCopy />} onClick={handleDupe}>
-                Copy
-              </Menus.Button>
-
-              <Modal.Open opens={"edit-open"}>
-                <Menus.Button icone={<AiFillEdit />}>Edit</Menus.Button>
-              </Modal.Open>
-
-              <Modal.Open opens={"delete-open"}>
-                <Menus.Button icone={<AiFillDelete />}>Delete</Menus.Button>
-              </Modal.Open>
-            </Menus.List>
-          </Menus.Menu>
-
+          <Modal.Open opens={"edit-open"}>
+            <button>
+              {" "}
+              <AiFillEdit />
+            </button>
+          </Modal.Open>
           <Modal.Window name={"edit-open"}>
             <CreateCabinForm cabinToEdit={cabin} />
           </Modal.Window>
 
+          <Modal.Open opens={"delete-open"}>
+            <button>
+              {" "}
+              <AiFillDelete />
+            </button>
+          </Modal.Open>
           <Modal.Window name={"delete-open"}>
             <ConfirmDelete
               onConfirm={() => deleteCabin(cabinID)}
@@ -116,6 +110,21 @@ function CabinRow({ cabin }) {
             />
           </Modal.Window>
         </Modal>
+        <button onClick={handleDupe}>
+          <AiTwotoneCopy />
+        </button>
+
+        <Menus.Menu>
+          <Menus.Toggle id={cabinID} />
+
+          <Menus.List id={cabinID}>
+            <Menus.Button icone={<AiTwotoneCopy />} onClick={handleDupe}>
+              Copy
+            </Menus.Button>
+            <Menus.Button>EDIT</Menus.Button>
+            <Menus.Button>EDIT</Menus.Button>
+          </Menus.List>
+        </Menus.Menu>
       </div>
     </TableRow>
   );

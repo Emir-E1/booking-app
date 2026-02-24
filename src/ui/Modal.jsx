@@ -60,7 +60,7 @@ const Button = styled.button`
 `;
 const ModalContext = createContext();
 
-function Modal({ children, onClose }) {
+function Modal({ children }) {
   const [openName, setOpenName] = useState("");
   const open = setOpenName;
   const close = () => setOpenName("");

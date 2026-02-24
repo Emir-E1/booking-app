@@ -1,6 +1,11 @@
+import { useContext } from "react";
+import { useState } from "react";
+import { createContext } from "react";
+import { createPortal } from "react-dom";
+import { AiOutlineEllipsis } from "react-icons/ai";
 import styled from "styled-components";
 
-const StyledMenu = styled.div`
+const Menu = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -60,3 +65,50 @@ const StyledButton = styled.button`
     transition: all 0.3s;
   }
 `;
+const MenusContext = createContext();
+
+function Menus({ children }) {
+  const [openID, setOpenID] = useState("");
+  const open = setOpenID;
+  const close = () => setOpenID("");
+
+  return (
+    <MenusContext.Provider value={{ open, close, openID }}>
+      {children}
+    </MenusContext.Provider>
+  );
+}
+function Toggle({ id }) {
+  const { openID, open, close } = useContext(MenusContext);
+  function handleClick() {
+    openID === "" || openID !== id ? open(id) : close();
+  }
+  return (
+    <StyledToggle onClick={() => handleClick()}>
+      <AiOutlineEllipsis />
+    </StyledToggle>
+  );
+}
+
+function List({ children, id }) {
+  const { openID } = useContext(MenusContext);
+  if (openID !== id) return null;
+  return createPortal(
+    <StyledList position={{ x: 20, y: 20 }}>{children}</StyledList>,
+    document.body
+  );
+}
+
+function Button({ children }) {
+  return (
+    <li>
+      <StyledButton>{children}</StyledButton>
+    </li>
+  );
+}
+Menus.Menu = Menu;
+Menus.Toggle = Toggle;
+Menus.List = List;
+Menus.Button = Button;
+
+export default Menus;

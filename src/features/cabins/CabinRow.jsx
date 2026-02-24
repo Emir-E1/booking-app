@@ -4,10 +4,16 @@ import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
 import { usePostEditCabin } from "./usePostEditCabin";
-import { AiFillDelete, AiFillEdit, AiTwotoneCopy } from "react-icons/ai";
+import {
+  AiFillDelete,
+  AiFillEdit,
+  AiOutlineDatabase,
+  AiTwotoneCopy,
+} from "react-icons/ai";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "./../../ui/ConfirmDelete";
 import Button from "../../ui/Button";
+import Menus from "../../ui/Menus";
 const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -107,6 +113,16 @@ function CabinRow({ cabin }) {
         <button onClick={handleDupe}>
           <AiTwotoneCopy />
         </button>
+
+        <Menus.Menu>
+          <Menus.Toggle id={cabinID} />
+
+          <Menus.List id={cabinID}>
+            <Menus.Button>EDIT</Menus.Button>
+            <Menus.Button>EDIT</Menus.Button>
+            <Menus.Button>EDIT</Menus.Button>
+          </Menus.List>
+        </Menus.Menu>
       </div>
     </TableRow>
   );

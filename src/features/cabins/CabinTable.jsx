@@ -10,21 +10,36 @@ function CabinTable() {
   const [searchParams] = useSearchParams();
   const filterVal = searchParams.get("discount");
   console.log("all good");
-  const { isLoading, error, data: cabins } = useQuery({
+  const {
+    isLoading,
+    error,
+    data: cabins,
+  } = useQuery({
     queryKey: ["cabins"],
     queryFn: getCabins,
   });
 
   if (isLoading) return <Spinner />;
 
-  let filtredCabins = cabins;
+  let filteredCabins = cabins;
   if (filterVal === "no-discount") {
-    filtredCabins = cabins.filter((e) => e.discount === 0);
+    filteredCabins = cabins.filter((e) => e.discount === 0);
   }
 
   if (filterVal === "with-discount") {
-    filtredCabins = cabins.filter((e) => e.discount > 0);
+    filteredCabins = cabins.filter((e) => e.discount > 0);
   }
+
+  // 2) SORT
+  const sortBy = searchParams.get("sortBy") || "startDate-asc";
+  const [field, direction] = sortBy.split("-");
+  const modifier = direction === "asc" ? 1 : -1;
+  const sortedCabins = [...filteredCabins].sort((a, b) => {
+    const aVal = a[field];
+    const bVal = b[field];
+    if (typeof aVal === "string") return aVal.localeCompare(bVal) * modifier;
+    return (aVal - bVal) * modifier;
+  });
 
   return (
     <Menus>
@@ -38,7 +53,7 @@ function CabinTable() {
           <div></div>
         </Table.Header>
         <Table.Body
-          data={filtredCabins}
+          data={sortedCabins}
           render={(cabin) => <CabinRow cabin={cabin} key={cabin.id} />}
         />
       </Table>

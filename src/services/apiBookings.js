@@ -1,10 +1,39 @@
+import { PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
+
+const BOOKING_SELECT = "*, cabins(*), guests(*)";
+
+export async function getBookings({ filter, sortBy, page }) {
+  let query = supabase
+    .from("bookings")
+    .select(BOOKING_SELECT, { count: "exact" });
+  if (filter !== null) query[filter.method](filter.field, filter.value);
+  if (sortBy !== null)
+    query.order(sortBy.field, {
+      ascending: sortBy.order === "asc",
+    });
+
+  if (page) {
+    const from = page * (PAGE_SIZE - 1);
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error(error);
+    throw new Error("Bookings could not be loaded");
+  }
+
+  return { data, count };
+}
 
 export async function getBooking(id) {
   const { data, error } = await supabase
     .from("bookings")
-    .select("*, cabins(*), guests(*)")
+    .select(BOOKING_SELECT)
     .eq("id", id)
     .single();
 
@@ -36,8 +65,7 @@ export async function getBookingsAfterDate(date) {
 export async function getStaysAfterDate(date) {
   const { data, error } = await supabase
     .from("bookings")
-    // .select('*')
-    .select("*, guests(fullName)")
+    .select(BOOKING_SELECT)
     .gte("startDate", date)
     .lte("startDate", getToday());
 
@@ -46,14 +74,14 @@ export async function getStaysAfterDate(date) {
     throw new Error("Bookings could not get loaded");
   }
 
-  return data;
+  return data ?? [];
 }
 
 // Activity means that there is a check in or a check out today
 export async function getStaysTodayActivity() {
   const { data, error } = await supabase
     .from("bookings")
-    .select("*, guests(fullName, nationality, countryFlag)")
+    .select(BOOKING_SELECT)
     .or(
       `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`
     )
@@ -67,7 +95,7 @@ export async function getStaysTodayActivity() {
     console.error(error);
     throw new Error("Bookings could not get loaded");
   }
-  return data;
+  return data ?? [];
 }
 
 export async function updateBooking(id, obj) {

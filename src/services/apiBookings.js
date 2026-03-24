@@ -9,13 +9,17 @@ export async function getBookings({ filter, sortBy, page }) {
     .from("bookings")
     .select(BOOKING_SELECT, { count: "exact" });
   if (filter !== null) query[filter.method](filter.field, filter.value);
-  if (sortBy !== null)
-    query.order(sortBy.field, {
+
+  if (sortBy?.field) {
+    query = query.order(sortBy.field, {
       ascending: sortBy.order === "asc",
     });
+  } else {
+    query = query.order("created_at", { ascending: false });
+  }
 
-  if (page) {
-    const from = page * (PAGE_SIZE - 1);
+  if (page != null && page >= 1) {
+    const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
     query = query.range(from, to);
   }

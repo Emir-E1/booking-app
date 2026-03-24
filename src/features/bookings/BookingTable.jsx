@@ -1,14 +1,17 @@
 import BookingRow from "./BookingRow";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
-import { useQuery } from "@tanstack/react-query";
-import { getBookings } from "../../services/apiBookings";
 import { useBookings } from "./useBookings";
 import Empty from "../../ui/Empty";
 import Pagination from "../../ui/Pagination";
+import Spinner from "../../ui/Spinner";
 
 function BookingTable() {
   const { bookings, isLoading, error, count } = useBookings();
+
+  if (isLoading) return <Spinner />;
+
+  if (error) return <p>Could not load bookings: {error.message}</p>;
 
   if (!bookings?.length) return <Empty resource={"bookings"} />;
 

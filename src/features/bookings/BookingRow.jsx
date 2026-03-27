@@ -6,6 +6,9 @@ import Table from "../../ui/Table";
 
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
+import { AiFillCheckSquare, AiFillNotification } from "react-icons/ai";
+import { Navigate, useNavigate } from "react-router-dom";
+import Menus from "../../ui/Menus";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -35,8 +38,17 @@ const Amount = styled.div`
 `;
 
 function BookingRow({ booking }) {
-  const { startDate, endDate, numNights, totalPrice, status, guests, cabins } =
-    booking;
+  const navigate = useNavigate();
+  const {
+    startDate,
+    endDate,
+    numNights,
+    totalPrice,
+    status,
+    guests,
+    cabins,
+    id,
+  } = booking;
 
   const guestName = guests?.fullName ?? guests?.full_name ?? "—";
   const email = guests?.email ?? "";
@@ -73,6 +85,27 @@ function BookingRow({ booking }) {
       <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
 
       <Amount>{formatCurrency(totalPrice)}</Amount>
+
+      <Menus.Menu>
+        <Menus.Toggle id={id} />
+        <Menus.List id={id}>
+          <Menus.Button
+            icon={<AiFillNotification />}
+            onClick={() => navigate(`/bookings/${id}`)}
+          >
+            See details
+          </Menus.Button>
+
+          {status === "unconfirmed" && (
+            <Menus.Button
+              icon={<AiFillCheckSquare />}
+              onClick={() => navigate(`/checkin/${id}`)}
+            >
+              Check in
+            </Menus.Button>
+          )}
+        </Menus.List>
+      </Menus.Menu>
     </Table.Row>
   );
 }

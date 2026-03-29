@@ -22,16 +22,16 @@ const HeadingGroup = styled.div`
 function BookingDetail() {
   const navigate = useNavigate();
   const { booking, isLoading } = useBooking();
-  const { id: bookingId, status } = booking;
 
   const moveBack = useMoveBack();
+  if (isLoading) return <Spinner />;
+  const { id: bookingId, status } = booking;
 
   const statusToTagName = {
     unconfirmed: "blue",
     "checked-in": "green",
     "checked-out": "silver",
   };
-  if (isLoading) return <Spinner />;
 
   return (
     <>
@@ -50,9 +50,11 @@ function BookingDetail() {
           Back
         </Button>
 
-        <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
-          Check in
-        </Button>
+        {status === "unconfirmed" && (
+          <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
+            Check in
+          </Button>
+        )}
       </ButtonGroup>
     </>
   );

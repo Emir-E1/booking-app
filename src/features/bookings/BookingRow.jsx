@@ -6,9 +6,14 @@ import Table from "../../ui/Table";
 
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
-import { AiFillCheckSquare, AiFillNotification } from "react-icons/ai";
-import { Navigate, useNavigate } from "react-router-dom";
+import {
+  AiFillCheckSquare,
+  AiFillNotification,
+  AiOutlineLogout,
+} from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 import Menus from "../../ui/Menus";
+import { useCheckout } from "../check-in-out/useCheckout";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -39,6 +44,7 @@ const Amount = styled.div`
 
 function BookingRow({ booking }) {
   const navigate = useNavigate();
+  const { checkout, isCheckingOut } = useCheckout();
   const {
     startDate,
     endDate,
@@ -102,6 +108,15 @@ function BookingRow({ booking }) {
               onClick={() => navigate(`/checkin/${id}`)}
             >
               Check in
+            </Menus.Button>
+          )}
+          {status === "checked-in" && (
+            <Menus.Button
+              icon={<AiOutlineLogout />}
+              onClick={() => checkout(id)}
+              disabled={isCheckingOut}
+            >
+              Check out
             </Menus.Button>
           )}
         </Menus.List>

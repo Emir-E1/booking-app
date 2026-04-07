@@ -8,12 +8,15 @@ import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
 import {
   AiFillCheckSquare,
+  AiFillDelete,
   AiFillNotification,
   AiOutlineLogout,
 } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import Menus from "../../ui/Menus";
 import { useCheckout } from "../check-in-out/useCheckout";
+
+import { useDeleteBooking } from "./useDeleteBooking";
 
 const Cabin = styled.div`
   font-size: 1.6rem;
@@ -45,6 +48,7 @@ const Amount = styled.div`
 function BookingRow({ booking }) {
   const navigate = useNavigate();
   const { checkout, isCheckingOut } = useCheckout();
+  const { deleteBooked, isDeletingBooking } = useDeleteBooking();
   const {
     startDate,
     endDate,
@@ -96,7 +100,7 @@ function BookingRow({ booking }) {
         <Menus.Toggle id={id} />
         <Menus.List id={id}>
           <Menus.Button
-            icon={<AiFillNotification />}
+            icone={<AiFillNotification />}
             onClick={() => navigate(`/bookings/${id}`)}
           >
             See details
@@ -104,7 +108,7 @@ function BookingRow({ booking }) {
 
           {status === "unconfirmed" && (
             <Menus.Button
-              icon={<AiFillCheckSquare />}
+              icone={<AiFillCheckSquare />}
               onClick={() => navigate(`/checkin/${id}`)}
             >
               Check in
@@ -112,13 +116,21 @@ function BookingRow({ booking }) {
           )}
           {status === "checked-in" && (
             <Menus.Button
-              icon={<AiOutlineLogout />}
+              icone={<AiOutlineLogout />}
               onClick={() => checkout(id)}
               disabled={isCheckingOut}
             >
               Check out
             </Menus.Button>
           )}
+
+          <Menus.Button
+            icone={<AiFillDelete />}
+            onClick={() => deleteBooked(id)}
+            disabled={isDeletingBooking}
+          >
+            Delete
+          </Menus.Button>
         </Menus.List>
       </Menus.Menu>
     </Table.Row>

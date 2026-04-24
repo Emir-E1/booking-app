@@ -36,7 +36,15 @@ const FilterButton = styled.button`
 `;
 function Filter({ filterField, options }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentFilter = searchParams.get(filterField) || options.at(0);
+  const normalizedOptions =
+    options?.map((option) =>
+      typeof option === "object"
+        ? { value: option.value, label: option.label }
+        : { value: option, label: option }
+    ) ?? [];
+
+  const currentFilter =
+    searchParams.get(filterField) || normalizedOptions.at(0)?.value;
 
   function handleClick(value) {
     searchParams.set(filterField, value);
@@ -46,14 +54,14 @@ function Filter({ filterField, options }) {
   }
   return (
     <StyledFilter>
-      {options?.map((e) => (
+      {normalizedOptions.map(({ value, label }) => (
         <FilterButton
-          onClick={() => handleClick(e)}
-          active={e === currentFilter}
-          disabled={e === currentFilter}
+          key={value}
+          onClick={() => handleClick(value)}
+          active={value === currentFilter}
+          disabled={value === currentFilter}
         >
-          {" "}
-          {e}{" "}
+          {label}
         </FilterButton>
       ))}
     </StyledFilter>

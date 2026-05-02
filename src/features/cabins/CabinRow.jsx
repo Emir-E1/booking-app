@@ -3,10 +3,18 @@ import { formatCurrency } from "../../utils/helpers";
 import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
-import Table from "./../../ui/Table";
-import { AiFillCopy, AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { usePostEditCabin } from "./usePostEditCabin";
-/*const TableRow = styled.div`
+import {
+  AiFillDelete,
+  AiFillEdit,
+  AiOutlineDatabase,
+  AiTwotoneCopy,
+} from "react-icons/ai";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "./../../ui/ConfirmDelete";
+import Button from "../../ui/Button";
+import Menus from "../../ui/Menus";
+const TableRow = styled.div`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
   column-gap: 2.4rem;
@@ -46,10 +54,8 @@ const Discount = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const [showForm, setShowForm] = useState(false);
   const { mutate: deleteCabin, isDeleting } = useDeleteCabin();
-  const { mutate: createCabin, isCreating } = usePostEditCabin();
-
+  const { mutate: dupeCabin } = usePostEditCabin();
   const {
     name,
     image,
@@ -60,39 +66,58 @@ function CabinRow({ cabin }) {
     id: cabinID,
   } = cabin;
 
-  function handleDuplicate() {
-    createCabin({
-      name: `Copy of ${name}`,
-      maxCapacity,
-      regularPrice,
-      discount,
-      image,
-      description,
+  function handleDupe() {
+    const { id, ...cabinData } = cabin;
+    dupeCabin({
+      newCabinData: {
+        ...cabinData,
+        name: `Copy of ${name}`,
+      },
+      id: undefined, // Pas d'id pour créer une nouvelle entrée
     });
   }
 
   return (
-    <>
-      <Table.Row role="row">
-        <Img src={image} />
-        <Cabin>{name}</Cabin>
-        <div>Fits up tp {maxCapacity} guests</div>
-        <Price>{formatCurrency(regularPrice)}</Price>
-        <Discount>{formatCurrency(discount)}</Discount>
-        <div>
-          <button disabled={isCreating} onClick={handleDuplicate}>
-            <AiFillCopy />
-          </button>
-          <button onClick={() => setShowForm((show) => !show)}>
-            <AiFillEdit />
-          </button>
-          <button onClick={() => deleteCabin(cabinID)} disabled={isDeleting}>
-            <AiFillDelete />
-          </button>
-        </div>
-      </Table.Row>
-      {showForm && <CreateCabinForm cabinToEdit={cabin} />}
-    </>
+    <TableRow role="row">
+      <Img src={image} />
+
+      <Cabin>{name}</Cabin>
+      <div>Fits up tp {maxCapacity} guests</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      <Discount>{formatCurrency(discount)}</Discount>
+      <div>
+        <Modal>
+          <Menus.Menu>
+            <Menus.Toggle id={cabinID} />
+
+            <Menus.List id={cabinID}>
+              <Menus.Button icone={<AiTwotoneCopy />} onClick={handleDupe}>
+                Copy
+              </Menus.Button>
+
+              <Modal.Open opens={"edit-open"}>
+                <Menus.Button icone={<AiFillEdit />}>Edit</Menus.Button>
+              </Modal.Open>
+
+              <Modal.Open opens={"delete-open"}>
+                <Menus.Button icone={<AiFillDelete />}>Delete</Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+          </Menus.Menu>
+
+          <Modal.Window name={"edit-open"}>
+            <CreateCabinForm cabinToEdit={cabin} />
+          </Modal.Window>
+
+          <Modal.Window name={"delete-open"}>
+            <ConfirmDelete
+              onConfirm={() => deleteCabin(cabinID)}
+              disabled={isDeleting}
+            />
+          </Modal.Window>
+        </Modal>
+      </div>
+    </TableRow>
   );
 }
 

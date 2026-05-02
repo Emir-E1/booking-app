@@ -16,8 +16,9 @@ export const deleteCabin = async (id) => {
     console.log(error);
   }
 };
+
 export const postEditCabin = async (newCabin, id) => {
-  const hasImagePath = typeof newCabin.image === "string";
+  const hasImagePath = typeof newCabin?.image === "string";
 
   let imagePath = newCabin.image;
 

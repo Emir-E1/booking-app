@@ -1,53 +1,55 @@
 import {
-  HiOutlineBriefcase,
-  HiOutlineCalendarDays,
-  HiOutlineBanknotes,
-  HiOutlineChartBar,
-} from 'react-icons/hi2';
-import { formatCurrency } from 'utils/helpers';
-import Stat from './Stat';
-
-function Stats({ bookings, confirmedStays, numDays, cabinCount }) {
-  // Stat 1)
-  const numBookings = bookings.length;
-
-  // Stat 2)
-  const sales = bookings.reduce((acc, cur) => acc + cur.totalPrice, 0);
-
-  // Stat 3)
-  const checkins = confirmedStays.length;
-
-  // Stat 4)
-  // We will use a trick to calculate occupancy rate. It's not 100% accurate, but we want to keep it simple. We know we can have a total of 'numDays * cabinCount' days to occupy, and we also know how many days were actually booked. From this, we can compute the percentage
+  FiBarChart,
+  FiBriefcase,
+  FiCalendar,
+  FiDollarSign,
+} from "react-icons/fi";
+import Stat from "../dashboard/Stat";
+import { formatCurrency } from "../../utils/helpers";
+function Stats({
+  recentBookings = [],
+  confirmedStays = [],
+  numDays,
+  cabinsCount,
+}) {
+  const numBookings = recentBookings.length;
+  const numStays = confirmedStays.length;
+  const sales = recentBookings.reduce(
+    (acc, curr) => acc + (curr.totalPrice ?? 0),
+    0
+  );
   const occupation =
-    confirmedStays.reduce((acc, cur) => acc + cur.numNights, 0) /
-    (numDays * cabinCount);
+    confirmedStays.reduce((acc, curr) => acc + (curr.numNights ?? 0), 0) /
+    (numBookings * cabinsCount);
 
   return (
     <>
       <Stat
-        icon={<HiOutlineBriefcase />}
-        title='Bookings'
+        icon={<FiBriefcase />}
         value={numBookings}
-        color='blue'
+        color={"blue"}
+        title={"Bookings"}
       />
+
       <Stat
-        icon={<HiOutlineBanknotes />}
-        title='Sales'
+        icon={<FiDollarSign />}
         value={formatCurrency(sales)}
-        color='green'
+        color={"green"}
+        title={"Sales"}
       />
+
       <Stat
-        icon={<HiOutlineCalendarDays />}
-        title='Check ins'
-        value={checkins}
-        color='indigo'
+        icon={<FiCalendar />}
+        value={numStays}
+        color={"indigo"}
+        title={"Check ins"}
       />
+
       <Stat
-        icon={<HiOutlineChartBar />}
-        title='Occupancy rate'
-        value={Math.round(occupation * 100) + '%'}
-        color='yellow'
+        icon={<FiBarChart />}
+        value={Math.round(occupation * 100) + "%"}
+        color={"yellow"}
+        title={"Occupation Rates"}
       />
     </>
   );

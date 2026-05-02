@@ -13,6 +13,7 @@ export function usePostEditCabin(options = {}) {
         queryKey: ["cabins"],
       });
       onSuccessCallback?.(...args);
+      toast.success(" Add Sucess !");
     },
     onError: (err) => {
       toast.error("Error editing!");

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Empty from "../../ui/Empty";
 
 import BookingDataBox from "./BookingDataBox";
 import Row from "../../ui/Row";
@@ -7,8 +8,12 @@ import Tag from "../../ui/Tag";
 import ButtonGroup from "../../ui/ButtonGroup";
 import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
+import Spinner from "../../ui/Spinner";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
+import { useBooking } from "./useBooking";
+import { useNavigate } from "react-router-dom";
+import { useDeleteBooking } from "./useDeleteBooking";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -17,10 +22,14 @@ const HeadingGroup = styled.div`
 `;
 
 function BookingDetail() {
-  const booking = {};
-  const status = "checked-in";
+  const navigate = useNavigate();
+  const { booking, isLoading } = useBooking();
+  const { deleteBooked, isDeletingBooking } = useDeleteBooking();
 
   const moveBack = useMoveBack();
+  if (isLoading) return <Spinner />;
+  if (!booking) return <Empty resource={"Bookings"} />;
+  const { id: bookingId, status } = booking;
 
   const statusToTagName = {
     unconfirmed: "blue",
@@ -32,7 +41,7 @@ function BookingDetail() {
     <>
       <Row type="horizontal">
         <HeadingGroup>
-          <Heading as="h1">Booking #X</Heading>
+          <Heading as="h1">Booking # {bookingId}</Heading>
           <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
         </HeadingGroup>
         <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
@@ -41,6 +50,18 @@ function BookingDetail() {
       <BookingDataBox booking={booking} />
 
       <ButtonGroup>
+        {status === "unconfirmed" && (
+          <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
+            Check in
+          </Button>
+        )}
+        <Button
+          variation="danger"
+          onClick={() => deleteBooked(bookingId)}
+          disabled={isDeletingBooking}
+        >
+          Delete
+        </Button>
         <Button variation="secondary" onClick={moveBack}>
           Back
         </Button>

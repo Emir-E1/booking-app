@@ -9,11 +9,10 @@ import Spinner from "../../ui/Spinner";
 function BookingTable() {
   const { bookings, isLoading, error, count } = useBookings();
 
-  if (isLoading) return <Spinner />;
-
   if (error) return <p>Could not load bookings: {error.message}</p>;
 
   if (!bookings?.length) return <Empty resource={"bookings"} />;
+  if (isLoading) return <Spinner />;
 
   return (
     <Menus>

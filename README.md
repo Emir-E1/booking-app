@@ -69,3 +69,4 @@ src/
 
 - This project assumes a working **Supabase** setup (Auth + tables + storage bucket).
 - Protected pages redirect unauthenticated users to `/login`.
+  ²

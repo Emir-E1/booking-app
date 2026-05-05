@@ -5,7 +5,7 @@
 //<BookingDataBox booking={booking} />
 
 import { useQuery } from "@tanstack/react-query";
-import { get } from "react-hook-form";
+
 import { useParams } from "react-router-dom";
 import { getBooking } from "../../services/apiBookings";
 

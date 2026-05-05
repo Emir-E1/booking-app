@@ -1,18 +1,12 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
-import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
 import { useDeleteCabin } from "./useDeleteCabin";
 import { usePostEditCabin } from "./usePostEditCabin";
-import {
-  AiFillDelete,
-  AiFillEdit,
-  AiOutlineDatabase,
-  AiTwotoneCopy,
-} from "react-icons/ai";
+import { AiFillDelete, AiFillEdit, AiTwotoneCopy } from "react-icons/ai";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "./../../ui/ConfirmDelete";
-import Button from "../../ui/Button";
+
 import Menus from "../../ui/Menus";
 const TableRow = styled.div`
   display: grid;
@@ -62,7 +56,7 @@ function CabinRow({ cabin }) {
     regularPrice,
     discount,
     maxCapacity,
-    description,
+
     id: cabinID,
   } = cabin;
 
